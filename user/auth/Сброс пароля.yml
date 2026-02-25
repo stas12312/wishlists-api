@@ -1,0 +1,35 @@
+info:
+  name: Сброс пароля
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{base_url}}/api/auth/reset-password"
+  body:
+    type: json
+    data: |-
+      {
+          "uuid": "{{uuid}}",
+          "code": "{{code}}",
+          "secret_key": "{{secret_key}}",
+          "password": "{{password}}"
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: uuid
+      value: ""
+    - name: password
+      value: ""
+    - name: code
+      value: ""
+    - name: secret_key
+      value: ""
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

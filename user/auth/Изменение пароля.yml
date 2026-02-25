@@ -1,0 +1,24 @@
+info:
+  name: Изменение пароля
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{base_url}}/api/user/change-password"
+  body:
+    type: json
+    data: |-
+      {
+          "old_password": "",
+          "new_password": ""
+      }
+  auth:
+    type: bearer
+    token: "{{access_token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

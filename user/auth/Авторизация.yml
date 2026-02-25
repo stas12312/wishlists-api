@@ -1,0 +1,47 @@
+info:
+  name: Авторизация
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{base_url}}/api/auth/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "{{email}}",
+        "password": "{{password}}"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Токены должны быть не пустыми", function() {
+          expect(res.getBody().access_token).not.equal(undefined)
+        })
+  actions:
+    - type: set-variable
+      phase: after-response
+      selector:
+        expression: res.body.access_token
+        method: jsonq
+      variable:
+        name: access_token
+        scope: runtime
+    - type: set-variable
+      phase: after-response
+      selector:
+        expression: res.body.refresh_token
+        method: jsonq
+      variable:
+        name: refresh_token
+        scope: runtime
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

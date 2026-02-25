@@ -1,0 +1,112 @@
+info:
+  name: Обновление токена
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{base_url}}/api/auth/refresh"
+  body:
+    type: json
+    data: |-
+      {
+        "refresh_token": {{refresh_token}}
+      }
+  auth: inherit
+
+runtime:
+  actions:
+    - type: set-variable
+      phase: after-response
+      selector:
+        expression: res.body.access_token
+        method: jsonq
+      variable:
+        name: access_token
+        scope: runtime
+    - type: set-variable
+      phase: after-response
+      selector:
+        expression: res.body.refresh_token
+        method: jsonq
+      variable:
+        name: refresh_token
+        scope: runtime
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Обновление через Body
+    request:
+      url: "{{base_url}}/api/auth/refresh"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "refresh_token": {{refresh_token}}
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: server
+          value: nginx/1.18.0 (Ubuntu)
+        - name: date
+          value: Wed, 25 Feb 2026 14:31:12 GMT
+        - name: content-type
+          value: application/json
+        - name: content-length
+          value: "332"
+        - name: connection
+          value: keep-alive
+        - name: vary
+          value: Origin
+        - name: server-timing
+          value: app;dur=135.262Âµs
+        - name: set-cookie
+          value: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImlAc3ZydXNoLnJ1IiwiZXhwIjoxNzc0NjIxODcyLCJpZCI6NDUwfQ.ChS_vLMt__L0Ery7OitKmYHEEZJIHyaP0iUYDxYTl4o; expires=Fri, 27 Mar 2026 14:31:12 GMT; path=/; HttpOnly; secure; SameSite=None
+      body:
+        type: json
+        data: |-
+          {
+            "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImlAc3ZydXNoLnJ1IiwiZXhwIjoxNzcyMDMwNzcyLCJpZCI6NDUwfQ.IU8Bj0qw-PaKn9TMWWNI7DISECyBD87o2aCYXzGHdpE",
+            "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImlAc3ZydXNoLnJ1IiwiZXhwIjoxNzc0NjIxODcyLCJpZCI6NDUwfQ.ChS_vLMt__L0Ery7OitKmYHEEZJIHyaP0iUYDxYTl4o"
+          }
+  - name: Обновление через Cookie
+    request:
+      url: "{{base_url}}/api/auth/refresh"
+      method: POST
+      headers:
+        - name: Cookie
+          value: refresh_token={{refresh_token}}
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: server
+          value: nginx/1.18.0 (Ubuntu)
+        - name: date
+          value: Wed, 25 Feb 2026 14:34:27 GMT
+        - name: content-type
+          value: application/json
+        - name: content-length
+          value: "86"
+        - name: connection
+          value: keep-alive
+        - name: vary
+          value: Origin
+        - name: server-timing
+          value: app;dur=81.961Âµs
+      body:
+        type: json
+        data: |-
+          {
+            "message": "Не передан токен",
+            "details": "Unprocessable Entity",
+            "code": 0
+          }

@@ -1,0 +1,26 @@
+info:
+  name: Запрос восстановления пароля
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: "{{base_url}}/api/auth/restore"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "{{email}}"
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: email
+      value: email
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
