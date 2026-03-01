@@ -18,6 +18,56 @@ request:
   auth:
     type: bearer
     token: "{{access_token}}"
+  scripts:
+    - type: before-request
+      code: |-
+        const {parseJwt} = require("./parseJwt")
+
+        // Данный PreRequest отключен для авторизации и обновлении токена
+        const url = req.getUrl()
+        if (
+            url.endsWith("auth/login") 
+            || url.endsWith("auth/refresh")
+        ){
+          console.info("Для данного запроса отключен Pre Request")
+          return
+        }
+
+        const refreshToken = bru.getVar("refresh_token")
+
+        if (!refreshToken) {
+          console.log("Нет токена обновления")
+          return
+        }
+
+
+        const baseUrl = bru.getEnvVar("base_url")
+
+        // Проверка необходимости обновления токена
+        const access_token = bru.getVar("access_token")
+        if (access_token) {
+          const decodedToken = parseJwt(access_token)
+          if (decodedToken.exp > Math.floor(Date.now() / 1000)) {
+            return
+          }
+        }
+
+
+        const requestResponse = await bru.sendRequest({
+          method: "POST",
+          url: `${baseUrl}/api/auth/refresh`,
+          data: {
+            "refresh_token": refreshToken
+          }
+        }, function(err, res) {
+            if (err) {
+            console.error('Error:', err);
+            return;
+          }
+          console.log("Обновление JWT токенов")
+          bru.setVar("access_token", res.data.access_token)
+          bru.setVar("refresh_token",res.data.refresh_token)
+        })
 bundled: false
 extensions:
   bruno:
